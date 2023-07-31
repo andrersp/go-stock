@@ -9,45 +9,55 @@ import (
 )
 
 const (
-	emptyUsername = "Username not be empty"
-	emptyEmail    = "Email not be empty"
-	invalidEmail  = "Email not be empty"
-	emptyPassowrd = "Password not be empty and mininum 6 chars"
+	errEmptyUsername   = "Username not be empty"
+	errEmptyEmail      = "Email not be empty"
+	errInvalidEmail    = "Invalid email"
+	errEmptyPassword   = "Password not be empty"
+	errInvalidPassowrd = "password must be at least 6 characters long "
 )
 
 type User struct {
-	Id       uuid.UUID
-	UserName string
-	Password string
-	Email    string
-	Enable   bool
+	id       uuid.UUID
+	userName string
+	password string
+	email    string
+	enable   bool
 }
 
-func (u *User) Validate() error {
+func NewUser(userName, password, email string) (user *User, err error) {
 
-	u.UserName = strings.TrimSpace(u.UserName)
-	u.Email = strings.TrimSpace(u.Email)
+	userName = strings.TrimSpace(userName)
+	email = strings.TrimSpace(email)
 
-	if u.UserName == "" {
-		err := domain.NewAppError("INVALID_PARAM", emptyUsername)
-		return err
+	if userName == "" {
+		err = domain.NewAppError("VALIDATION_ERROR", errEmptyUsername)
+		return
 	}
 
-	if u.Email == "" {
-		err := domain.NewAppError("INVALID_PARAM", emptyEmail)
-		return err
+	if email == "" {
+		err = domain.NewAppError("VALIDATION_ERROR", errEmptyEmail)
+		return
 	}
 
-	if _, err := mail.ParseAddress(u.Email); err != nil {
-		err := domain.NewAppError("INVALID_PARAM", invalidEmail)
-		return err
+	if _, err = mail.ParseAddress(email); err != nil {
+		err = domain.NewAppError("VALIDATION_ERROR", errInvalidEmail)
+		return
 	}
 
-	if u.Password == "" || len(u.Password) < 6 {
-		err := domain.NewAppError("INVALID_PARAM", emptyPassowrd)
-		return err
-
+	if password == "" {
+		err = domain.NewAppError("VALIDATION_ERROR", errEmptyPassword)
+		return
 	}
-	return nil
+	if len(password) < 6 {
+		err = domain.NewAppError("VALIDATION_ERROR", errInvalidPassowrd)
+		return
+	}
+	return &User{
+		id:       uuid.New(),
+		userName: userName,
+		password: password,
+		email:    email,
+		enable:   true,
+	}, nil
 
 }

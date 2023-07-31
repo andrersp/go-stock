@@ -1,6 +1,9 @@
 package user
 
-import "github.com/google/uuid"
+import (
+	domain "github.com/andrersp/go-stock/internal/domain/errors"
+	"github.com/google/uuid"
+)
 
 type userService struct {
 	repository UserRepository
@@ -14,18 +17,19 @@ func NewUserService(repository UserRepository) UserService {
 
 func (us *userService) CreateUser(user *User) (*User, error) {
 
-	err := user.Validate()
-
-	if err != nil {
+	if userDomain, _ := us.repository.GetUserByUserName(user.userName); userDomain != nil {
+		err := domain.NewAppError("RESOURCE_EXISTS", "username exists.")
 		return nil, err
 	}
 
-	return nil, nil
+	user, err := us.repository.CreateUser(user)
+
+	return user, err
 }
 
-func (us *userService) GetUserByID(uuid.UUID) (*User, error) {
+func (us *userService) GetUserByID(userId uuid.UUID) (*User, error) {
 
-	return nil, nil
+	return us.repository.GetUserByID(userId)
 
 }
 
