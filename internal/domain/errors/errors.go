@@ -5,7 +5,7 @@ import "fmt"
 var ERRORS = map[string]map[string]string{
 	"VALIDATION_ERROR": {"name": "VALIDATION_ERROR", "description": "indicates a error in input validation.", "detail": ""},
 	"RESOURCE_EXISTS":  {"name": "RESOURCE_EXISTS", "description": "indicates a duplicate / already existing record", "detail": ""},
-	"INVALID_PAYLOAD":  {"name": "INVALID_PAYLOAD", "description": "invalid payload", "detail": ""},
+	"NOT_FOUND":        {"name": "NOT_FOUND", "description": " indicates a missing / not found record", "detail": ""},
 	"INVALID_PARAM":    {"name": "INVALID_PARAM", "description": "invalid param on request", "detail": ""},
 	"INVALID_USERNAME": {"name": "INVALID_USERNAME", "description": "invalid username", "detail": ""},
 	"USER_NOT_FOUND":   {"name": "USER_NOT_FOUND", "description": "user not found", "detail": ""},

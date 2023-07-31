@@ -29,11 +29,19 @@ func (us *userService) CreateUser(user *User) (*User, error) {
 
 func (us *userService) GetUserByID(userId uuid.UUID) (*User, error) {
 
-	return us.repository.GetUserByID(userId)
+	user, err := us.repository.GetUserByID(userId)
+
+	if err != nil {
+		err = domain.NewAppError("NOT_FOUND", "user not found by id")
+		return nil, err
+	}
+
+	return user, nil
 
 }
 
 func (us *userService) GetUserByUserName(string) (*User, error) {
+
 	return nil, nil
 }
 
