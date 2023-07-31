@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	domain "github.com/andrersp/go-stock/internal/domain/errors"
+	"github.com/andrersp/go-stock/internal/utils/security"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
@@ -93,6 +94,24 @@ func TestServiceUser(t *testing.T) {
 		}, nil)
 		sut, _ := service.ListUsers()
 		assert.Len(t, sut, 1)
+	})
+
+	t.Run("when_login_return_success", func(t *testing.T) {
+
+		hashedPassword, _ := security.HashGenerator("mypassword")
+
+		userDomain := User{
+			id:       uuid.New(),
+			userName: validUserName,
+			password: hashedPassword,
+			email:    validEmail,
+		}
+
+		repository.EXPECT().GetUserByUserName(userDomain.userName).Return(&userDomain, nil)
+		sut, err := service.Login(userDomain.userName, "mypassword")
+		assert.Nil(t, err)
+		assert.NotNil(t, sut)
+
 	})
 
 }

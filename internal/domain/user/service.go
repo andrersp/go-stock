@@ -12,6 +12,7 @@ type UserService interface {
 	GetUserByUserName(string) (*User, error)
 	GetUserByEmail(string) (*User, error)
 	ListUsers() ([]User, error)
+	Login(string, string) (*User, error)
 }
 
 type userService struct {
@@ -70,4 +71,21 @@ func (us *userService) GetUserByEmail(email string) (*User, error) {
 func (us *userService) ListUsers() ([]User, error) {
 	return us.repository.ListUsers()
 
+}
+
+func (us *userService) Login(userName, password string) (*User, error) {
+
+	user, err := us.repository.GetUserByUserName(userName)
+
+	if err != nil {
+		err := domain.NewAppError("VALIDATION_ERROR", "invalid username or password")
+		return nil, err
+	}
+
+	if err := security.CheckPasswordHash(user.GetPassword(), password); err != nil {
+		err := domain.NewAppError("VALIDATION_ERROR", "invalid username or password")
+		return nil, err
+	}
+
+	return user, nil
 }
