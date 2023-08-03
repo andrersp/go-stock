@@ -3,3 +3,4 @@ temp/
 .env
 docs/
 *.sqlite
+*.out

@@ -2,8 +2,8 @@ package user
 
 import (
 	domain "github.com/andrersp/go-stock/internal/domain/errors"
-	"github.com/andrersp/go-stock/internal/utils/security"
 	"github.com/google/uuid"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type UserService interface {
@@ -37,7 +37,7 @@ func (us *userService) CreateUser(user *User) (*User, error) {
 		return nil, err
 	}
 
-	hashedPassword, _ := security.HashGenerator(user.GetPassword())
+	hashedPassword, _ := passwordHashGenerator(user.GetPassword())
 	user.SetPassword(hashedPassword)
 
 	user, err := us.repository.CreateUser(user)
@@ -82,10 +82,27 @@ func (us *userService) Login(userName, password string) (*User, error) {
 		return nil, err
 	}
 
-	if err := security.CheckPasswordHash(user.GetPassword(), password); err != nil {
+	if err := checkPasswordHash(user.GetPassword(), password); err != nil {
 		err := domain.NewAppError("VALIDATION_ERROR", "invalid username or password")
 		return nil, err
 	}
 
 	return user, nil
+}
+
+func passwordHashGenerator(plainPassword string) (hashedPassword string, err error) {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(plainPassword), bcrypt.DefaultCost)
+	if err != nil {
+		err = domain.NewAppError("VALIDATION_ERROR", "error on generate has password")
+		return
+	}
+
+	hashedPassword = string(bytes)
+	return
+
+}
+
+func checkPasswordHash(hashedPassword, plainPassword string) error {
+	return bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(plainPassword))
+
 }

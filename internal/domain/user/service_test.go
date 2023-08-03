@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	domain "github.com/andrersp/go-stock/internal/domain/errors"
-	"github.com/andrersp/go-stock/internal/utils/security"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
@@ -98,7 +97,7 @@ func TestServiceUser(t *testing.T) {
 
 	t.Run("when_login_return_success", func(t *testing.T) {
 
-		hashedPassword, _ := security.HashGenerator("mypassword")
+		hashedPassword, _ := passwordHashGenerator("mypassword")
 
 		userDomain := User{
 			id:       uuid.New(),
