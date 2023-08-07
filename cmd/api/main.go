@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"fmt"
+	"log"
 	"os"
 	"os/signal"
 	"time"
@@ -10,15 +10,23 @@ import (
 	_ "github.com/andrersp/go-stock/docs"
 	"github.com/andrersp/go-stock/internal/api"
 	"github.com/andrersp/go-stock/internal/config"
-	"github.com/andrersp/go-stock/internal/utils"
-	"github.com/go-playground/validator"
-	"github.com/labstack/echo/v4"
-
-	echoSwagger "github.com/swaggo/echo-swagger"
+	"github.com/andrersp/go-stock/internal/repository"
 )
 
 func init() {
 	config.LoadConfig()
+
+	err := config.CreateDatabaseConnection()
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = repository.Migrate()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 }
 
 // @title Api Stock Azul e Rosa
@@ -34,18 +42,13 @@ func init() {
 // @name Authorization
 func main() {
 
-	e := echo.New()
-	e.Binder = &utils.CustomBinder{}
-	e.Validator = &utils.CustomValidator{Validator: validator.New()}
-	e.GET("/docs/*", echoSwagger.WrapHandler)
-
-	api.RegisterPath(e)
+	server := api.StartServer()
 
 	// run server
 	go func() {
-		address := fmt.Sprintf(":%s", config.API_PORT)
-		if err := e.Start(address); err != nil {
-			e.Logger.Fatal("shutting down the server")
+		if err := server.ListenAndServe(); err != nil {
+
+			log.Fatal("shutting down the server")
 		}
 	}()
 
@@ -58,8 +61,8 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	if err := e.Shutdown(ctx); err != nil {
-		e.Logger.Fatal(err)
+	if err := server.Shutdown(ctx); err != nil {
+		log.Fatal(err)
 	}
 
 	// api.StartServer()

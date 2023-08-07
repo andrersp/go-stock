@@ -1,4 +1,4 @@
-package utils
+package api
 
 import (
 	"errors"
@@ -7,9 +7,9 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type CustomBinder struct{}
+type customBinder struct{}
 
-func (cb *CustomBinder) Bind(i interface{}, c echo.Context) (err error) {
+func (cb *customBinder) Bind(i interface{}, c echo.Context) (err error) {
 
 	db := new(echo.DefaultBinder)
 	if err = db.Bind(i, c); err != nil {

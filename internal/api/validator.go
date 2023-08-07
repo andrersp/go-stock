@@ -1,17 +1,17 @@
-package utils
+package api
 
 import (
 	domain "github.com/andrersp/go-stock/internal/domain/errors"
 	"github.com/go-playground/validator"
 )
 
-type CustomValidator struct {
-	Validator *validator.Validate
+type customValidator struct {
+	validator *validator.Validate
 }
 
-func (cv *CustomValidator) Validate(i interface{}) error {
+func (cv *customValidator) Validate(i interface{}) error {
 
-	if err := cv.Validator.Struct(i); err != nil {
+	if err := cv.validator.Struct(i); err != nil {
 		errorDetail := normalizeError(err)
 		err := domain.NewAppError("VALIDATION_ERROR", errorDetail)
 		return err
@@ -36,6 +36,8 @@ func normalizeError(err error) (errorDetail string) {
 		case "min":
 			errorDetail = e.Field() + " must have " + e.Param() + " characters at least!"
 			return
+		case "eqfield":
+			errorDetail = e.Field() + " does not match with " + e.Param()
 		default:
 			errorDetail += "error on field " + e.Tag() + " " + e.Field()
 

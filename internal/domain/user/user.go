@@ -58,6 +58,10 @@ func (u *User) SetUserName(userName string) error {
 
 }
 
+func (u *User) SetID(id uuid.UUID) {
+	u.id = id
+}
+
 func (u *User) SetEmail(email string) error {
 	email = strings.TrimSpace(email)
 	if email == "" {
