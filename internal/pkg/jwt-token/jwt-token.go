@@ -15,8 +15,8 @@ const (
 
 func CreateAccessToken(user *user.User) (token string, err error) {
 
-	atClaims := jwtTokenClaims{
-		ID: user.GetId(),
+	atClaims := JwtTokenClaims{
+		UserID: user.GetId(),
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(JWT_ACCESS_TOKEN_EXPIRED_TIME)),
 		},
@@ -30,7 +30,7 @@ func CreateAccessToken(user *user.User) (token string, err error) {
 
 func CreateRefreshToken(user *user.User) (token string, err error) {
 
-	atClaims := jwtRefreshTokenClaims{
+	atClaims := JwtRefreshTokenClaims{
 		ID: user.GetId(),
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(JWT_REFRESH_TOKEN_EXPIRED_TIME)),

@@ -1,6 +1,7 @@
 package routers
 
 import (
+	"github.com/andrersp/go-stock/internal/api/middlewares"
 	"github.com/andrersp/go-stock/internal/config"
 	"github.com/andrersp/go-stock/internal/domain/user"
 	userrepository "github.com/andrersp/go-stock/internal/repository/user"
@@ -16,7 +17,6 @@ type RouterModel struct {
 
 func RegisterRouters(e *echo.Echo) {
 	v1 := e.Group("/v1")
-
 	db, err := config.ConnectDB()
 
 	if err != nil {
@@ -31,7 +31,11 @@ func RegisterRouters(e *echo.Echo) {
 	routers = append(routers, userRouters...)
 
 	for _, router := range routers {
-		v1.Add(router.Method, router.Path, router.Func)
+		if router.AuthRequired {
+			v1.Add(router.Method, router.Path, router.Func, middlewares.JwtMiddleware)
+		} else {
+			v1.Add(router.Method, router.Path, router.Func)
+		}
 	}
 
 }
