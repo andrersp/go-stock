@@ -3,8 +3,9 @@ package controler
 import (
 	"net/http"
 
-	"github.com/andrersp/go-stock/internal/api/controllers/user/request"
-	"github.com/andrersp/go-stock/internal/api/controllers/user/response"
+	"github.com/andrersp/go-stock/internal/api/controllers/user/schema"
+	jwttoken "github.com/andrersp/go-stock/internal/pkg/jwt-token"
+
 	"github.com/andrersp/go-stock/internal/domain/user"
 	"github.com/labstack/echo/v4"
 )
@@ -21,12 +22,12 @@ func NewUserControler(userService user.UserService) *userControler {
 // @summary Login
 // @description "Endpoint login"
 // @tags Login
-// @param payload body request.LoginRequest true "Payload"
-// @success 200 {object} response.LoginResponse
+// @param payload body LoginRequest true "Payload"
+// @success 200 {object} LoginResponse
 // @router /login [post]
 func (uc userControler) Login(c echo.Context) error {
 
-	var payload request.LoginRequest
+	var payload schema.LoginRequest
 
 	if err := c.Bind(&payload); err != nil {
 		return c.JSON(400, err)
@@ -42,19 +43,33 @@ func (uc userControler) Login(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, err)
 	}
 
-	return c.JSON(200, user)
+	accessToken, err := jwttoken.CreateAccessToken(user)
+	if err != nil {
+		return c.String(400, err.Error())
+	}
+
+	refreshToken, err := jwttoken.CreateRefreshToken(user)
+	if err != nil {
+		return c.String(400, err.Error())
+	}
+
+	return c.JSON(200, schema.LoginResponse{
+		TokenType:    "Bearer",
+		AccessToken:  accessToken,
+		RefreshToken: refreshToken,
+	})
 }
 
 // @summary Get Users
 // @description Get List of users
 // @tags Users
 // @security ApiKey
-// @success 200 {array} response.UserResponse
-// @failure 400 {object} domain.AppError
+// @success 200 {array} UserResponse
+// @failure 400 {object} AppError
 // @router /users [get]
 func (uc userControler) GetUsers(c echo.Context) error {
 
-	responseDTO := make([]response.UserResponse, 0)
+	responseDTO := make([]schema.UserResponse, 0)
 
 	users, err := uc.userService.ListUsers()
 
@@ -63,7 +78,7 @@ func (uc userControler) GetUsers(c echo.Context) error {
 	}
 
 	for _, u := range users {
-		userDTO := response.UserResponse{
+		userDTO := schema.UserResponse{
 			ID:       u.GetId(),
 			UserName: u.GetUserName(),
 			Email:    u.GetEmail(),
@@ -72,7 +87,6 @@ func (uc userControler) GetUsers(c echo.Context) error {
 		responseDTO = append(responseDTO,
 			userDTO,
 		)
-
 	}
 
 	return c.JSON(http.StatusOK, responseDTO)
@@ -83,13 +97,13 @@ func (uc userControler) GetUsers(c echo.Context) error {
 // @description Create a new user
 // @tags Users
 // @security ApiKey
-// @param payload body request.CreateUserRequest true "Payload"
-// @success 201 {object} response.CreateUserResponse
-// @failure 400 {object} domain.AppError
+// @param payload body CreateUserRequest true "Payload"
+// @success 201 {object} CreateUserResponse
+// @failure 400 {object} AppError
 // @router /users [post]
 func (uc userControler) CreateUser(c echo.Context) error {
 
-	var payload request.CreateUserRequest
+	var payload schema.CreateUserRequest
 
 	if err := c.Bind(&payload); err != nil {
 		return c.JSON(400, err)
@@ -110,7 +124,7 @@ func (uc userControler) CreateUser(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, err)
 	}
 
-	responseDTO := response.CreateUserResponse{ID: user.GetId()}
+	responseDTO := schema.CreateUserResponse{ID: user.GetId()}
 
 	return c.JSON(http.StatusCreated, responseDTO)
 }

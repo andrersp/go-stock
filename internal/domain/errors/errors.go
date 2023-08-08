@@ -19,7 +19,7 @@ type AppError struct {
 	ErrorName   string `json:"errorName" example:"GENERIC_ERROR"`
 	Description string `json:"description" example:"Generic error os proccess request."`
 	Detail      string `json:"detail"`
-}
+} //@name AppError
 
 func (e *AppError) Error() string {
 	return fmt.Sprintf("errorName: %s, description: %s", e.ErrorName, e.Description)
