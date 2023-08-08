@@ -27,12 +27,12 @@ func NewUserService(repository UserRepository) UserService {
 
 func (us *userService) CreateUser(user *User) (*User, error) {
 
-	if _, err := us.repository.GetUserByUserName(user.userName); err == nil {
+	if u, _ := us.repository.GetUserByUserName(user.userName); u != nil {
 		err := domain.NewAppError("RESOURCE_EXISTS", "username exists.")
 		return nil, err
 	}
 
-	if _, err := us.repository.GetUserByEmail(user.email); err == nil {
+	if u, _ := us.repository.GetUserByEmail(user.email); u != nil {
 		err := domain.NewAppError("RESOURCE_EXISTS", "email exists.")
 		return nil, err
 	}

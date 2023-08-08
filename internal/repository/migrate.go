@@ -2,6 +2,7 @@ package repository
 
 import (
 	"github.com/andrersp/go-stock/internal/config"
+	userrepository "github.com/andrersp/go-stock/internal/repository/user"
 )
 
 func Migrate() error {
@@ -10,5 +11,5 @@ func Migrate() error {
 	if err != nil {
 		return err
 	}
-	return db.AutoMigrate(&UserModel{})
+	return db.AutoMigrate(&userrepository.User{})
 }

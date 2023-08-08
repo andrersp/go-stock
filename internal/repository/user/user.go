@@ -1,4 +1,4 @@
-package repository
+package userrepository
 
 import (
 	"github.com/andrersp/go-stock/internal/domain/user"
@@ -18,47 +18,54 @@ func NewUserRepository(db *gorm.DB) user.UserRepository {
 
 func (ur *userRepository) CreateUser(user *user.User) (*user.User, error) {
 
-	model := userDomainToModel(user)
-
+	model := fromEntity(user)
 	err := ur.db.Create(&model).Error
-
 	if err != nil {
 		return nil, err
 	}
 
-	return model.toDomainModel(), nil
+	return model.toEntity(), nil
 }
 
 func (ur *userRepository) GetUserByID(uuid.UUID) (*user.User, error) {
 	return nil, nil
 }
 
-func (ur *userRepository) GetUserByUserName(userName string) (*user.User, error) {
-	var user UserModel
+func (ur *userRepository) GetUserByUserName(userName string) (user *user.User, err error) {
 
-	err := ur.db.Where("user_name = ?", userName).First(&user).Error
+	var model User
+	err = ur.db.Where("user_name = ?", userName).First(&model).Error
+	if err != nil {
+		return
+	}
 
-	return user.toDomainModel(), err
+	user = model.toEntity()
+
+	return
 }
 
-func (ur *userRepository) GetUserByEmail(email string) (*user.User, error) {
+func (ur *userRepository) GetUserByEmail(email string) (user *user.User, err error) {
 
-	var user UserModel
+	var model User
+	err = ur.db.Where("email = ?", email).First(&model).Error
+	if err != nil {
+		return
+	}
 
-	err := ur.db.Where("email = ?", email).First(&user).Error
+	user = model.toEntity()
 
-	return user.toDomainModel(), err
+	return
 }
 
 func (ur *userRepository) ListUsers() ([]user.User, error) {
 
-	var model []UserModel
+	var model []User
 	users := make([]user.User, 0)
 	err := ur.db.Find(&model).Error
 
 	for _, u := range model {
 		users = append(users,
-			*u.toDomainModel())
+			*u.toEntity())
 	}
 
 	return users, err

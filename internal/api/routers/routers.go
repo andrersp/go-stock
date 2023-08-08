@@ -3,7 +3,7 @@ package routers
 import (
 	"github.com/andrersp/go-stock/internal/config"
 	"github.com/andrersp/go-stock/internal/domain/user"
-	"github.com/andrersp/go-stock/internal/repository"
+	userrepository "github.com/andrersp/go-stock/internal/repository/user"
 	"github.com/labstack/echo/v4"
 )
 
@@ -23,7 +23,7 @@ func RegisterRouters(e *echo.Echo) {
 		panic(err)
 	}
 
-	userRepository := repository.NewUserRepository(db)
+	userRepository := userrepository.NewUserRepository(db)
 	userService := user.NewUserService(userRepository)
 
 	routers := make([]RouterModel, 0)

@@ -1,11 +1,11 @@
-package repository
+package userrepository
 
 import (
 	"github.com/andrersp/go-stock/internal/domain/user"
 	"github.com/google/uuid"
 )
 
-type UserModel struct {
+type User struct {
 	Id       uuid.UUID `gorm:"type:uuid;primaryKey;autoIncrement:false;index;"`
 	UserName string    `gorm:"size:40;"`
 	Password string
@@ -13,11 +13,11 @@ type UserModel struct {
 	Enable   bool   `gorm:"default:false"`
 }
 
-func (UserModel) TableName() string {
+func (User) TableName() string {
 	return "users"
 }
 
-func (u *UserModel) toDomainModel() *user.User {
+func (u *User) toEntity() *user.User {
 
 	var user user.User
 
@@ -29,8 +29,8 @@ func (u *UserModel) toDomainModel() *user.User {
 	return &user
 }
 
-func userDomainToModel(user *user.User) *UserModel {
-	return &UserModel{
+func fromEntity(user *user.User) *User {
+	return &User{
 		Id:       user.GetId(),
 		UserName: user.GetUserName(),
 		Password: user.GetPassword(),

@@ -37,7 +37,12 @@ func (uc userControler) Login(c echo.Context) error {
 
 	}
 
-	return c.JSON(200, payload)
+	user, err := uc.userService.Login(payload.UserName, payload.Password)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err)
+	}
+
+	return c.JSON(200, user)
 }
 
 // @summary Get Users
@@ -104,7 +109,6 @@ func (uc userControler) CreateUser(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, err)
 	}
-	return c.String(200, "ok")
 
 	responseDTO := response.CreateUserResponse{ID: user.GetId()}
 
