@@ -17,6 +17,7 @@ type RouterModel struct {
 
 func RegisterRouters(e *echo.Echo) {
 	v1 := e.Group("/v1")
+
 	db, err := config.ConnectDB()
 
 	if err != nil {

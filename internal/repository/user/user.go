@@ -62,6 +62,9 @@ func (ur *userRepository) ListUsers() ([]user.User, error) {
 	var model []User
 	users := make([]user.User, 0)
 	err := ur.db.Find(&model).Error
+	if err != nil {
+		return nil, err
+	}
 
 	for _, u := range model {
 		users = append(users,

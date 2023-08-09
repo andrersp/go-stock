@@ -25,7 +25,6 @@ func StartServer() *http.Server {
 	e := echo.New()
 	e.Binder = &customBinder{}
 	e.Validator = &customValidator{validator: validator.New()}
-
 	e.HideBanner = true
 
 	e.GET("/docs/*", echoSwagger.WrapHandler)
