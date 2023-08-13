@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"os"
 	"os/signal"
@@ -46,7 +47,7 @@ func main() {
 
 	// run server
 	go func() {
-		if err := server.ListenAndServe(); err != nil {
+		if err := server.Start(fmt.Sprintf(":%s", config.API_PORT)); err != nil {
 
 			log.Fatal("shutting down the server")
 		}
