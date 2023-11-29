@@ -12,6 +12,7 @@ import (
 	"github.com/labstack/echo-contrib/echoprometheus"
 
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	echoSwagger "github.com/swaggo/echo-swagger"
 )
 
@@ -25,6 +26,7 @@ type RouterModel struct {
 func StartServer() *echo.Echo {
 
 	e := echo.New()
+	e.Use(middleware.Logger())
 	e.Binder = &customBinder{}
 	e.Validator = &customValidator{validator: validator.New()}
 	e.Server.ReadTimeout = 10 * time.Second
